@@ -14,10 +14,10 @@ const AppointmentAdminPanel = () => {
     checked: null,
   });
 
-  const handleSortChange = (key) => {
+  const handleSortChange = (value) => {
     setSortConfig((prevConfig) => ({
-      key,
-      direction: prevConfig.direction === 'asc' ? 'desc' : 'asc',
+      ...prevConfig,
+      key: value,
     }));
   };
 
@@ -41,7 +41,8 @@ const AppointmentAdminPanel = () => {
     const fetchAppointments = async () => {
       const response = await fetch('/api/getappointments');
       const data = await response.json();
-      const updatedData = data.map(appointment => ({ ...appointment, isChecked: false }));
+      const updatedData = data.map(appointment => ({ ...appointment, isChecked: false, status: appointment.status || ""  }));
+      
       setAppointments(updatedData);
     };
     fetchAppointments();
@@ -82,17 +83,21 @@ const AppointmentAdminPanel = () => {
 
   const applyFilters = (appointments) => {
     return appointments.filter((appointment, index) => {
-      const statusMatch = !filters.status || statuses[index] === filters.status;
-      const checkedMatch = filters.checked === null || appointment.isChecked === filters.checked;
+      const statusMatch = !filters.status || appointment.status === filters.status;
+      console.log(`Appointment status: ${appointment.status}, Filter status: ${filters.status}`);
+      console.log("Appointment Object:", appointment);
 
-      const dateMatch = !filters.dateRange.start || !filters.dateRange.end ||
+
+      const checkedMatch = filters.checked === null || appointment.isChecked === filters.checked;
+      const dateMatch = (!filters.dateRange.start || !filters.dateRange.end) ||
         (new Date(appointment.date) >= new Date(filters.dateRange.start) &&
-        new Date(appointment.date) <= new Date(filters.dateRange.end));
+          new Date(appointment.date) <= new Date(filters.dateRange.end));
 
       return statusMatch && checkedMatch && dateMatch;
     });
   };
 
+  const filteredAppointments = applyFilters(sortedAppointments);
   const getTotalAppointmentsData = () => {
     const totalAppointments = appointments.length;
     const appointmentsPerMonth = appointments.reduce((acc, appointment) => {
@@ -286,8 +291,8 @@ const AppointmentAdminPanel = () => {
       )}
 
       {showApplications ? (
-        <div className="overflow-auto">
-          <table className="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="  overflow-auto max-h-[13000px]">
+          <table className="table-auto w-full bg-white shadow-md rounded-lg overflow-auto">
             <thead className="bg-gray-200">
               <tr>
                 <th className="px-2 sm:px-4 py-2">S.No</th>
