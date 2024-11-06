@@ -1,5 +1,5 @@
 import connectMongo from "../../lib/mongoose";
-import Appointment from "../../models/Appointment";
+import Appointment from "../../Models/Appointment";
 export async function GET(req) {
     await connectMongo();
 
