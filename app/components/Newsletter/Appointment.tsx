@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -7,35 +7,51 @@ const Appointment = () => {
         name: "",
         email: "",
         date: "",
+        time: "",
         comments: ""
     });
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Process form data, send to backend, etc.
-        console.log("Form submitted:", formData);
+
+        try {
+            const response = await fetch("/api/appointments", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                console.log("Appointment created successfully!");
+                setFormData({ name: "", email: "", date: "", time: "", comments: "" });
+            } else {
+                console.error("Failed to create appointment");
+            }
+        } catch (error) {
+            console.error("An error occurred:", error);
+        }
     };
 
     return (
         <div id="appointmentBooking">
-            <div className='-mt-32 relative z-3'>
+            <div className="-mt-32 relative z-3">
                 <div className="mx-auto max-w-2xl lg:max-w-7xl bg-blue-500 rounded-3xl">
                     <div className="grid grid-cols-1 gap-y-10 gap-x-6 lg:grid-cols-2 xl:gap-x-8">
 
                         {/* COLUMN-1 */}
-                        <div className='hidden lg:block'>
-                            <div className='float-right pt-20 relative'>
+                        <div className="hidden lg:block">
+                            <div className="float-right pt-20 relative">
                                 <Image src={'/assets/newsletter/bgImage.png'} alt="bgimg" width={588} height={334} />
                                 <div className="absolute top-10 right-0">
-                                    <Image src={'/assets/newsletter/leaf.svg'} alt="leafimg" width={81} height={81}/>
+                                    <Image src={'/assets/newsletter/leaf.svg'} alt="leafimg" width={81} height={81} />
                                 </div>
                                 <div className="absolute bottom-8 left-2">
-                                    <Image src={'/assets/newsletter/circel.svg'} alt="circleimg" width={30} height={30}/>
+                                    <Image src={'/assets/newsletter/circle.svg'} alt="circleimg" width={30} height={30} />
                                 </div>
                             </div>
                         </div>
@@ -71,12 +87,24 @@ const Appointment = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="date" className="block text-white">Preferred Date/Time</label>
+                                    <label htmlFor="date" className="block text-white">Preferred Date</label>
                                     <input
-                                        type="datetime-local"
+                                        type="date"
                                         name="date"
                                         id="date"
                                         value={formData.date}
+                                        onChange={handleChange}
+                                        required
+                                        className="py-3 text-sm w-full text-black bg-white rounded-lg pl-4"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="time" className="block text-white">Preferred Time</label>
+                                    <input
+                                        type="time"
+                                        name="time"
+                                        id="time"
+                                        value={formData.time}
                                         onChange={handleChange}
                                         required
                                         className="py-3 text-sm w-full text-black bg-white rounded-lg pl-4"
@@ -89,7 +117,6 @@ const Appointment = () => {
                                         id="comments"
                                         value={formData.comments}
                                         onChange={handleChange}
-                                        required
                                         className="py-3 text-sm w-full text-black bg-white rounded-lg pl-4"
                                         placeholder="Any specific details or requests"
                                     />
