@@ -84,10 +84,6 @@ const AppointmentAdminPanel = () => {
   const applyFilters = (appointments) => {
     return appointments.filter((appointment, index) => {
       const statusMatch = !filters.status || appointment.status === filters.status;
-      console.log(`Appointment status: ${appointment.status}, Filter status: ${filters.status}`);
-      console.log("Appointment Object:", appointment);
-
-
       const checkedMatch = filters.checked === null || appointment.isChecked === filters.checked;
       const dateMatch = (!filters.dateRange.start || !filters.dateRange.end) ||
         (new Date(appointment.date) >= new Date(filters.dateRange.start) &&
